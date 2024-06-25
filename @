@@ -1,0 +1,89 @@
+-- The character table(object) will act as a read only with the command function doing the majority of the work
+local Character = {
+	["name"] = "The Hero",
+	["SKILLS"] = {
+		["STR"] = 2,
+		["DEX"] = 0,
+		["WIL"] = 1,
+	},
+	["Level"] = 1,
+	["EQUIPPED"] = {},
+	["INVENTORY"] = {},
+	-- getter methods
+	["getstats"] = function(self)
+		for k, v in pairs(self.SKILLS) do
+			print(k .. " --> " .. tostring(v))
+		end
+		print("press any key to continue")
+		io.read("*l")
+	end,
+}
+
+local gameversion <const> = "ALPHA"
+local function playTitle()
+	local title = {
+
+		" __   __  _______  __   __  _______  __   __    _______  _______    _______  __   __  _______    __   __  ___   __    _  _______  _______  _______  __   __  ______ ",
+		"|  |_|  ||       ||  | |  ||       ||  | |  |  |       ||       |  |       ||  | |  ||       |  |  |_|  ||   | |  |  | ||       ||       ||   _   ||  | |  ||    _ |    ",
+		"|       ||   _   ||  | |  ||_     _||  |_|  |  |   _   ||    ___|  |_     _||  |_|  ||    ___|  |       ||   | |   |_| ||   _   ||_     _||  |_|  ||  | |  ||   | ||    ",
+		"|       ||  | |  ||  |_|  |  |   |  |       |  |  | |  ||   |___     |   |  |       ||   |___   |       ||   | |       ||  | |  |  |   |  |       ||  |_|  ||   |_||_   ",
+		"|       ||  |_|  ||       |  |   |  |       |  |  |_|  ||    ___|    |   |  |       ||    ___|  |       ||   | |  _    ||  |_|  |  |   |  |       ||       ||    __  |  ",
+		"| ||_|| ||       ||       |  |   |  |   _   |  |       ||   |        |   |  |   _   ||   |___   | ||_|| ||   | | | |   ||       |  |   |  |   _   ||       ||   |  | |  ",
+		"|_|   |_||_______||_______|  |___|  |__| |__|  |_______||___|        |___|  |__| |__||_______|  |_|   |_||___| |_|  |__||_______|  |___|  |__| |__||_______||___|  |_|  \n\n",
+		gameversion,
+	}
+	-- need a for loop that prints out each value of the table based on the size of the table
+	for i = 0, #title do
+		print(title[i])
+	end
+	print(
+		"In the heart of an ancient realm, where myths intertwine with reality, there exists a labyrinthine maze shrouded in mystery and peril – the domain of the dreaded Minotaur. Legends whispered of its twisting corridors, where the echoes of past heroes' footsteps mingled with the roars of the monstrous beast that lurked within."
+	)
+	print("press enter to continue")
+
+	local pahs = io.read("*l")
+
+	print(
+		"Yet, amidst the daunting tales, a lone warrior emerged, fueled not by fear, but by an unwavering resolve and love that knew no bounds. Clad in armor forged from the finest steel, his sword gleamed with determination as he embarked on a quest that would test both his strength and his spirit."
+	)
+
+	print("press enter to continue")
+	io.read("*l")
+end
+
+local function commandController(command)
+	local newCharacter = Character
+	local prompt
+	-- need to look into calling functions from tables
+	local Commands = {
+		["STATS"] = function()
+			Character.getstats(Character)
+		end,
+		["INVENTORY"] = "inventory accessed",
+		["LOOK AROUND"] = "its Dark",
+	}
+	prompt = Commands[command]
+	if type(prompt) == "nil" then
+		print("command not recognized\n\n")
+	elseif type(prompt) == "string" then
+		print(prompt)
+	elseif type(prompt) == "function" then
+		prompt()
+	end
+	-- this if statment needs to be changed to actually handle results that could include other things
+end
+
+function main()
+	playTitle()
+	local state = 1
+	while state == 1 do
+		print("What do you want to do?\n----------------------------")
+		local command = string.upper(io.read("*l"))
+		if command == "EXIT" then
+			state = 0
+		else
+			commandController(command)
+		end
+	end
+end
+main()
