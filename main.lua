@@ -16,14 +16,14 @@ local Character = {
 	},
 	["Level"] = 1,
 	["EQUIPPED"] = {
-		["Armor"] = {},
-		["LHand"] = {},
-		["RHand"] = {},
-		["belt1"] = {},
-		["belt2"] = {},
+		["Armor"] = "Leather Armor",
+		["LHand"] = "",
+		["RHand"] = "",
+		["belt1"] = "",
+		["belt2"] = "",
 	},
 	-- container has been converted to a table need to perform a deeper copy of the table to use correctly
-	["INVENTORY"] = extra.tableClone(container["basicContainer"]),
+	["INVENTORY"] = extra.tableDeepClone(container["basicContainer"]),
 	-- getter methods
 	["getstats"] = function(self)
 		for k, v in pairs(self.SKILLS) do
@@ -95,52 +95,9 @@ local function commandController(command)
 		["STAT"] = function()
 			entityFuncs.getStats(Character)
 		end,
+		-- this needs to be extracted as its own function/table for ease of use
 		["INVENTORY"] = function()
-			local inventCmdList = { "EQUIP", "DROP" }
-			local inventMark = 1
-
-			local inventoryReducer = function(input)
-				local inventoryCommands = {
-					["DROP"] = function(toDelete)
-						local itemToDelete
-						-- just make into a number that runs through the table and replaces it with blank
-						-- may need to ask for prompt here instead of straight to delete
-						for slotNum, item in ipairs(Character["INVENTORY"]) do
-							if slotNum == tonumber(toDelete) then
-								Character["INVENTORY"][tonumber(toDelete)] = "blank"
-								itemToDelete = item
-							end
-						end
-						print(itemToDelete .. " dropped")
-					end,
-					["EQUIP"] = function(toEquip)
-						print("equip function called")
-					end,
-				}
-				print(inventoryCommands[input[1]](input[2]))
-			end
-			local function cmds(input)
-				local command = extra.cmdResolver(inventCmdList, input)
-				inventoryReducer(command)
-			end
-			while inventMark == 1 do
-				os.execute("clear")
-				print(type(Character.INVENTORY[1]))
-				print(utf8.char(9659) .. "inventory")
-
-				print("Commands: DROP [item] | EQUIP [item]")
-				for inventSlot, inventItem in ipairs(Character["INVENTORY"]) do
-					print(tostring(inventSlot) .. ")  " .. inventItem)
-				end
-				local inventRes = string.upper(io.read("*l"))
-				if inventRes == "EXIT" then
-					inventMark = 2
-				else
-					print(cmds(inventRes))
-				end
-
-				io.read("*l")
-			end
+			Character.INVENTORY = container.openContainer(Character.INVENTORY, "inventory")
 		end,
 		["LOOK"] = function()
 			print(maze[currentLocation]["RoomDescript"])
@@ -167,7 +124,7 @@ local function commandController(command)
 			if type(keyword) == "function" then
 				print(HelpReducer["LIST"])
 			else
-				print(HelpReducer[string.upper(keyword)])
+				print(HelpReducer[string.upper(keyword[2])])
 			end
 		end,
 	}
